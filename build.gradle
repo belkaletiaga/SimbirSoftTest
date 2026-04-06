@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id("io.qameta.allure") version "3.1.0"
+}
+
+group = 'test.SimbirSoft'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // JUnit 5
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Selenium
+    implementation 'org.seleniumhq.selenium:selenium-java:4.41.0'
+    // Allure
+    testImplementation 'io.qameta.allure:allure-junit5:2.33.0'
+    implementation 'io.qameta.allure:allure-java-commons:2.33.0'
+    // Логгер
+    testImplementation 'org.slf4j:slf4j-simple:2.0.17'
+}
+
+test {
+    useJUnitPlatform()
+}
