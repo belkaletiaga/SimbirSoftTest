@@ -55,7 +55,7 @@
 <details>
 <summary> ТС-2: Проверка отправки формы с заполнением только поля Name</summary>
 
-![Allure Report](src/test/resources/TC-2.png)
+![Allure Report](src/test/resources/ТС-2.png)
 </details>
 
 <details>
