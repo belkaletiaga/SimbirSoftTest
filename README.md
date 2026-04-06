@@ -43,6 +43,7 @@
 ##  Allure отчет
 <details>
 <summary> Общий Allure отчет</summary>
+  
 ![Allure Report](src/test/resources/allureReport.png)
 </details>
 
