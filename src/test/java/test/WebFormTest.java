@@ -1,24 +1,26 @@
 package test;
 
+import Utils.RandomUtils;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.*;
 import pages.FormFieldsPage;
 
 public class WebFormTest extends BaseTest {
     FormFieldsPage formPage;
-    @AllureId("TC-1")
+
     @Test
+    @AllureId("TC-1")
     @Tag("Positive")
     @DisplayName("Проверка отправки формы с заполнением всех полей")
     void checkSubmitTitleTest()  {
         formPage = new FormFieldsPage(driver,wait);
 
         formPage.enterName(formPage.nameInput, "Name", "Test")
-                .enterName(formPage.passwordInput, "Password", "123456789")
+                .enterName(formPage.passwordInput, "Password", RandomUtils.randomPasswords(10))
                 .selectDrink("Milk")
                 .selectDrink("Coffee")
                 .selectColor("Yellow")
-                .selectAutomation()
+                .selectAutomationOption()
                 .enterName(formPage.emailInput, "Email", "name@example.com")
                 .enterName(formPage.messageTextarea, "Message", formPage.generateMessage())
                 .clickSubmit();
