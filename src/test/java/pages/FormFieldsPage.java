@@ -1,44 +1,52 @@
 package pages;
 
+import Utils.RandomUtils;
+import Utils.WaitUtils;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 import java.util.List;
-import java.util.Random;
 
 public class FormFieldsPage extends BasePage {
 
+    // Поле Name
     @FindBy(id = "name-input")
     public WebElement nameInput;
 
+    // Поле Password
     @FindBy(xpath  = "//input[@type='password']")
     public WebElement passwordInput;
 
-
+    // Чек-боксы для выбора напитка 'drink'
     @FindBy(xpath = "//input[@type='checkbox']")
     public List<WebElement> drinkCheckboxs;
 
+    // Радиокнопки цвета 'color'
     @FindBy(xpath = "//input[@type='radio']")
     public List<WebElement> radioButtonsColors;
 
-    // Выпадающий список
+    // Дропдаун меню
     @FindBy(id = "automation")
     public WebElement automationDropdown;
 
+    // Варианты дропдаун меню, position() = 0 - это дефолтное значение
     @FindBy(xpath = "//select/option[position() > 1]")
     public List<WebElement> automationSelectOption;
 
+    // Cписок Automation tools
     @FindBy(xpath = "//*[@id=\"feedbackForm\"]/ul/li[position() > 0]")
     public List<WebElement> automationToolsList;
 
+    // Поле Email
     @FindBy(id = "email")
     public WebElement emailInput;
 
+    // Поле Message
     @FindBy(id = "message")
     public WebElement messageTextarea;
 
@@ -50,19 +58,25 @@ public class FormFieldsPage extends BasePage {
         super(driver, wait);
     }
 
+    /**
+     * Универсальный метод для ввода текста в поле
+     */
     @Step("Заполнить поле {nameInput} значением '{text}'")
     public FormFieldsPage enterName(WebElement input, String nameInput, String text) {
         scrollToElement(input);
-        wait.until(ExpectedConditions.visibilityOf(input)).sendKeys(text);
+        WaitUtils.waitForVisible(wait, input);
+        input.sendKeys(text);
         return this;
     }
 
-
+    /**
+     * Универсальный метод для выбора напитка в чек-боксе
+     */
     @Step("Выбирать напиток '{drink}' из списка 'What is your favorite drink?'")
     public FormFieldsPage selectDrink(String drink) {
 
         WebElement selectCheckbox = null;
-        wait.until(driver ->!drinkCheckboxs.isEmpty() && drinkCheckboxs.get(0).isDisplayed());
+        WaitUtils.waitForListVisible(wait, drinkCheckboxs);
         for (WebElement drinkCheckbox : drinkCheckboxs) {
             if (drink.equals(drinkCheckbox.getAttribute("value"))) {
                 selectCheckbox = drinkCheckbox;
@@ -72,13 +86,17 @@ public class FormFieldsPage extends BasePage {
         if (selectCheckbox == null) {
             throw new RuntimeException("Напиток " + drink + " отсутствует в списке");
         }
+        WaitUtils.waitForVisibleAndClickable(wait,selectCheckbox);
         selectCheckbox.click();
         return this;
     }
 
+    /**
+     * Универсальный метод для выбора любого цвета
+     */
     @Step("Выбирать цвет '{color}' из списка 'What is your favorite color?'")
     public FormFieldsPage selectColor(String color) {
-        wait.until(driver ->!radioButtonsColors.isEmpty() && radioButtonsColors.get(0).isDisplayed());
+        WaitUtils.waitForListVisible(wait, radioButtonsColors);
         WebElement selectRadioButton = null;
         for (WebElement c : radioButtonsColors) {
             if (color.equals(c.getAttribute("value"))) {
@@ -90,26 +108,32 @@ public class FormFieldsPage extends BasePage {
             throw new RuntimeException("Цвет " + color + " отсутствует в списке");
         }
         scrollToElement(selectRadioButton);
+        WaitUtils.waitForVisibleAndClickable(wait,selectRadioButton);
         selectRadioButton.click();
         return this;
     }
-    @Step("Выбрать в меню Do you like automation? любой вариант")
-    public FormFieldsPage selectRandomAutomationOption(WebElement randomElement) {
-        wait.until(ExpectedConditions.visibilityOf(automationDropdown));
-        wait.until(ExpectedConditions.elementToBeClickable(automationDropdown));
+
+    /**
+     * Универсальный метод для рандомного значения в dropdown меню
+     */
+    @Step("Выбрать в меню Do you like automation? любой вариант ")
+    public FormFieldsPage selectAutomationOption() {
         scrollToElement(automationDropdown);
+        WaitUtils.waitForVisibleAndClickable(wait,automationDropdown);
         automationDropdown.click();
-        wait.until(ExpectedConditions.visibilityOfAllElements(automationSelectOption));
-        wait.until(ExpectedConditions.elementToBeClickable(randomElement)).click();
+        WaitUtils.waitForListVisible(wait,automationSelectOption);
+        WebElement element = RandomUtils.selectRandomAutomation(automationSelectOption);
+        String getElement = element.getText();
+        Allure.step("Выбрана выбран: " + getElement);
+        WaitUtils.waitForVisibleAndClickable(wait, element);
+        element.click();
         return this;
     }
 
-    public FormFieldsPage selectAutomation()  {
-        Random random = new Random();
-        WebElement randomElement = automationSelectOption.get(random.nextInt(automationSelectOption.size()));
-        return selectRandomAutomationOption(randomElement);
-    }
 
+    /**
+     * Метод для поиска слова из списка Automation tools, содержащий наибольшее количество символов
+     */
     public String generateMessage() {
         if (automationToolsList.isEmpty()) {
             throw new RuntimeException("Список инструментов пуст");
@@ -125,9 +149,12 @@ public class FormFieldsPage extends BasePage {
         return longestTool;
     }
 
-
+    /**
+     * Метод для клика по кнопке [Submit]
+     */
     public void clickSubmit() {
         scrollToElement(submitButton);
+        WaitUtils.waitForVisibleAndClickable(wait, submitButton);
         submitButton.click();
     }
 }
